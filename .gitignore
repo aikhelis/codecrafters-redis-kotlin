@@ -1,9 +1,9 @@
 target/
 .idea/
-tasks/
-tests/
+# tasks/
+# tests/
 logs/
-/test*.sh
+# /test*.sh
 
 
 # Compiled class file
