@@ -24,10 +24,9 @@ fun handleClient(socket: Socket) {
             val request = String(buffer, 0, bytesRead)
             print("Received from $clientAddress: \n$request")
 
-//            val response = "+PONG\r\n"
             val (command, arguments) = parseRequest(request)
             val response = handleCommand(command, arguments)
-            print("Responding to $clientAddress with: \n$response")
+            print("Responding to $clientAddress: \n$response")
             output.write(response.toByteArray())
         }
     } catch (e: Exception) {
@@ -39,7 +38,7 @@ fun handleClient(socket: Socket) {
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     System.err.println("Logs from your program will appear here!")
     val serverSocket = ServerSocket(6379)
     serverSocket.reuseAddress = true
@@ -50,7 +49,7 @@ fun main(args: Array<String>) {
     // Handle concurrent clients
     while (true) {
         try {
-            val clientSocket = serverSocket.accept() // Wait for connection from client
+            val clientSocket = serverSocket.accept() // Wait for connection from a client
             // Handle each client in a separate thread
             thread {
                 handleClient(clientSocket)

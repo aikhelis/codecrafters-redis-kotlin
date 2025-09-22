@@ -1,10 +1,8 @@
-//package kot // Replace with your actual package name
-
 fun parseRequest(message: String): Pair<String, List<String>> {
     val trimmed = message.trimEnd('\r', '\n')
 
     val tokens = if (trimmed.startsWith("*")) {
-        parseRedisProtocol(trimmed)
+        parseRedisCommand(trimmed)
     } else {
         trimmed.split("\\s+".toRegex())
     }
@@ -15,7 +13,7 @@ fun parseRequest(message: String): Pair<String, List<String>> {
     return command to arguments
 }
 
-fun parseRedisProtocol(message: String): List<String> {
+fun parseRedisCommand(message: String): List<String> {
     val lines = message.split("\r\n")
     val paramCount = lines.firstOrNull()?.substringAfter("*")?.toIntOrNull() ?: 0
 
@@ -35,4 +33,40 @@ fun parseRedisProtocol(message: String): List<String> {
     }
 
     return result
+}
+
+// Individual RESP response functions
+fun respString(value: String): String {
+    return "+$value\r\n"
+}
+
+fun respError(message: String): String {
+    return "-$message\r\n"
+}
+
+fun respBulkString(value: String): String {
+    val length = value.length
+    return if (length == 0) {
+        "$0\r\n\r\n" // Empty bulk string
+    } else {
+        "$$length\r\n$value\r\n"
+    }
+}
+
+fun respNull(): String {
+    return "$-1\r\n"
+}
+
+fun respInteger(value: Int): String {
+    return ":$value\r\n"
+}
+
+// Function to encode RESP arrays
+fun respArray(elements: List<String>): String {
+    val result = StringBuilder()
+    result.append("*${elements.size}\r\n")
+    for (element in elements) {
+        result.append(element)
+    }
+    return result.toString()
 }

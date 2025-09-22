@@ -1,5 +1,10 @@
 target/
 .idea/
+tasks/
+tests/
+logs/
+/test*.sh
+
 
 # Compiled class file
 *.class
